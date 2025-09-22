@@ -1,43 +1,89 @@
-name: Shai Hulud Security Scan
+name: Node Package Security Scan
 
 on:
+  # Manual trigger via GitHub UI
+  workflow_dispatch:
+    inputs:
+      scan_directory:
+        description: 'Directory to scan (default: current directory)'
+        required: false
+        default: '.'
+      severity_level:
+        description: 'Severity level for scan'
+        required: false
+        default: 'error'
+        type: choice
+        options:
+          - error
+          - warning
+          - info
+  
+  # Trigger on push only if commit message contains [security-scan]
   push:
     branches: [ main, develop ]
+    
+  # Always run on pull requests
   pull_request:
     branches: [ main ]
+  
+  # Run daily at 2 AM UTC
   schedule:
-    # Run daily at 2 AM UTC
     - cron: '0 2 * * *'
 
 jobs:
-  shai-hulud-scan:
+  node-pkg-scan:
     name: Scan for Compromised Packages
     runs-on: ubuntu-latest
+    
+    # Skip push events unless commit message contains [security-scan] or it's a scheduled/manual run
+    if: |
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[security-scan]'))
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Shai Hulud Detector
+      - name: Node Package Scanner
         uses: ./  # Use your-org/shai-hulud-detector@v1 when published
         with:
-          config-path: '.shai-hulud.yml'
+          config-path: '.config.yml'
           fail-on-error: 'true'
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          directory: ${{ github.event.inputs.scan_directory || '.' }}
+          severity: ${{ github.event.inputs.severity_level || 'error' }}
         
       - name: Upload scan results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: shai-hulud-scan-results
+          name: node-pkg-scan-results
           path: |
-            shai-hulud-scan-*.json
-            .shai-hulud.yml
+            node-pkg-scan-*.json
+            .config.yml
           retention-days: 30
+
+  scan-skipped:
+    name: Security Scan Skipped
+    runs-on: ubuntu-latest
+    
+    # Show when scan is skipped for push events
+    if: |
+      github.event_name == 'push' && 
+      !contains(github.event.head_commit.message, '[security-scan]')
+    
+    steps:
+      - name: Scan skipped notification
+        run: |
+          echo "🔍 Security scan skipped for this push"
+          echo "To trigger a security scan on push, include '[security-scan]' in your commit message"
+          echo "Or manually trigger the scan using the Actions tab in GitHub"
 
   notify-security-team:
     name: Notify Security Team
-    needs: shai-hulud-scan
+    needs: node-pkg-scan
     runs-on: ubuntu-latest
     if: failure()
     
@@ -46,6 +92,6 @@ jobs:
         uses: 8398a7/action-slack@v3
         with:
           status: failure
-          text: '🚨 Shai Hulud scan detected compromised packages in ${{ github.repository }}'
+          text: '🚨 Node Package Scanner detected compromised packages in ${{ github.repository }}'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

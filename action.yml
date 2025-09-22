@@ -11,6 +11,14 @@ inputs:
     description: 'Path to configuration file (default: .config.yml)'
     required: false
     default: '.config.yml'
+  directory:
+    description: 'Directory to scan (default: current directory)'
+    required: false
+    default: '.'
+  severity:
+    description: 'Severity level for scan (error, warning, info)'
+    required: false
+    default: 'error'
   fail-on-error:
     description: 'Fail the action when compromised packages are found'
     required: false

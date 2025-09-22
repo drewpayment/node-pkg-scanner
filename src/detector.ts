@@ -42,14 +42,17 @@ export class NodePackageScanner {
 
     // Collect all unique compromised packages found
     const allCompromisedPackages: CompromisedPackage[] = [];
-    const packageNames = new Set<string>();
+    const packageKeys = new Set<string>();
     
     for (const result of scanResults) {
       for (const pkg of result.compromisedPackages) {
-        if (!packageNames.has(pkg.name)) {
-          packageNames.add(pkg.name);
+        // Create a unique key combining name and version for deduplication
+        const packageKey = `${pkg.name}@${pkg.version}`;
+        if (!packageKeys.has(packageKey)) {
+          packageKeys.add(packageKey);
           allCompromisedPackages.push({
             name: pkg.name,
+            version: pkg.version,
             source: config.additionalPackages.includes(pkg.name) ? 'additional' : 
                    fetchResult.usingCache ? 'cached' : 'remote'
           });
@@ -59,7 +62,7 @@ export class NodePackageScanner {
 
     const summary: ScanSummary = {
       totalFiles: await this.countPackageFiles(scanDir, config.excludeDirectories),
-      compromisedFiles: scanResults.length,
+      compromisedFiles: scanResults.filter(result => result.compromisedPackages.length > 0).length,
       compromisedPackages: allCompromisedPackages,
       usingCachedList: fetchResult.usingCache,
       scanResults
@@ -84,10 +87,14 @@ export class NodePackageScanner {
     if (compromisedPackages.length > 0) {
       console.log('\n🚨 Compromised Packages Detected:');
       
+      // Only show files that actually contain compromised packages
       for (const result of summary.scanResults) {
-        console.log(`\n   ${result.file} (${result.packageManager}):`);
-        for (const pkg of result.compromisedPackages) {
-          console.log(`     - ${pkg.name} [${pkg.source}]`);
+        if (result.compromisedPackages.length > 0) {
+          console.log(`\n   ${result.file} (${result.packageManager}):`);
+          for (const pkg of result.compromisedPackages) {
+            const versionInfo = pkg.version ? `@${pkg.version}` : '';
+            console.log(`     - ${pkg.name}${versionInfo} [${pkg.source}]`);
+          }
         }
       }
       

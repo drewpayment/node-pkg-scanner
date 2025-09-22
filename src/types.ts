@@ -9,13 +9,21 @@ export interface Config {
 
 export interface CompromisedPackage {
   name: string;
+  version?: string; // Version if available from compromised list
   source: 'remote' | 'cached' | 'additional';
+}
+
+export interface InstalledPackage {
+  name: string;
+  version: string;
+  source: 'dependencies' | 'devDependencies' | 'peerDependencies' | 'optionalDependencies' | 'package-lock.json' | 'yarn.lock' | 'pnpm-lock.yaml';
 }
 
 export interface ScanResult {
   file: string;
   packageManager: PackageManager;
   compromisedPackages: CompromisedPackage[];
+  installedPackages: InstalledPackage[]; // All packages found in this file
 }
 
 export interface ScanSummary {
@@ -31,7 +39,7 @@ export type PackageManager = 'npm' | 'yarn' | 'pnpm';
 export interface PackageManagerFile {
   pattern: string;
   type: PackageManager;
-  parser: (content: string) => string[];
+  parser: (content: string) => InstalledPackage[];
 }
 
 export const DEFAULT_CONFIG: Config = {

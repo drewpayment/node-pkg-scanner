@@ -4,7 +4,7 @@ import * as os from 'os';
 import fetch from 'node-fetch';
 
 export interface FetchResult {
-  packages: Set<string>;
+  packages: Map<string, string[]>; // package name -> array of compromised versions
   usingCache: boolean;
 }
 
@@ -23,7 +23,7 @@ export class CompromisedPackagesFetcher {
     cacheTimeoutMinutes: number,
     additionalPackages: string[] = []
   ): Promise<FetchResult> {
-    let packages: Set<string>;
+    let packages: Map<string, string[]>;
     let usingCache = false;
 
     try {
@@ -60,8 +60,13 @@ export class CompromisedPackagesFetcher {
       }
     }
 
-    // Add additional packages from config
-    additionalPackages.forEach(pkg => packages.add(pkg.trim()));
+    // Add additional packages from config (without versions for now)
+    additionalPackages.forEach(pkg => {
+      const trimmedPkg = pkg.trim();
+      if (!packages.has(trimmedPkg)) {
+        packages.set(trimmedPkg, []); // No specific versions for additional packages
+      }
+    });
     
     if (additionalPackages.length > 0) {
       console.log(`✓ Added ${additionalPackages.length} additional packages from config`);
@@ -70,18 +75,33 @@ export class CompromisedPackagesFetcher {
     return { packages, usingCache };
   }
 
-  private parsePackageList(content: string): Set<string> {
-    return new Set(
-      content
-        .split(/\r?\n/)
-        .map(line => line.trim())
-        .filter(line => line && !line.startsWith('#'))
-        .map(line => {
-          // Handle package:version format by extracting just the package name
-          const colonIndex = line.indexOf(':');
-          return colonIndex > 0 ? line.substring(0, colonIndex) : line;
-        })
-    );
+  private parsePackageList(content: string): Map<string, string[]> {
+    const packageMap = new Map<string, string[]>();
+    
+    content
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(line => line && !line.startsWith('#'))
+      .forEach(line => {
+        const colonIndex = line.indexOf(':');
+        if (colonIndex > 0) {
+          // Handle package:version format
+          const packageName = line.substring(0, colonIndex);
+          const version = line.substring(colonIndex + 1);
+          
+          if (!packageMap.has(packageName)) {
+            packageMap.set(packageName, []);
+          }
+          packageMap.get(packageName)!.push(version);
+        } else {
+          // Handle package name only (for additional packages)
+          if (!packageMap.has(line)) {
+            packageMap.set(line, []);
+          }
+        }
+      });
+    
+    return packageMap;
   }
 
   private ensureCacheDir(): void {
@@ -125,7 +145,7 @@ export class CompromisedPackagesFetcher {
     }
   }
 
-  private getEmbeddedPackages(): Set<string> {
+  private getEmbeddedPackages(): Map<string, string[]> {
     // Embedded fallback list based on known Shai Hulud packages
     const embeddedPackages = [
       'cr0wdstrike-fix',
@@ -138,6 +158,11 @@ export class CompromisedPackagesFetcher {
       'crowdstrikefix'
     ];
     
-    return new Set(embeddedPackages);
+    const packageMap = new Map<string, string[]>();
+    embeddedPackages.forEach(pkg => {
+      packageMap.set(pkg, []); // No specific versions for embedded packages
+    });
+    
+    return packageMap;
   }
 }
