@@ -1,0 +1,38 @@
+# Shai Hulud Detector Configuration
+# This file configures the scanning behavior for detecting compromised packages
+# from the Shai Hulud supply chain attack
+
+# Severity level when compromised packages are found
+# Options: error (fails CI), warning (logs but continues), info (informational only)
+severityLevel: error
+
+# URL to fetch the latest compromised packages list
+# Default points to the official Cobenian repository
+compromisedPackagesUrl: https://raw.githubusercontent.com/Cobenian/shai-hulud-detect/main/compromised-packages.txt
+
+# Root directory to start scanning from
+# If not specified, uses the current working directory
+# Useful for monorepos or when you want to scan a specific subdirectory
+# rootDirectory: ./packages
+
+# Additional packages to flag as compromised
+# Use this to add packages specific to your organization's threat intelligence
+additionalPackages:
+  # - suspicious-internal-package
+  # - potential-typosquatting-package
+
+# Directories to exclude from scanning
+# These directories will be completely ignored during the scan
+excludeDirectories:
+  - node_modules
+  - .git
+  - dist
+  - build
+  - coverage
+  - .next
+  - .nuxt
+
+# Cache timeout in minutes
+# How long to keep the compromised packages list cached locally
+# Set to 0 to always fetch from remote (not recommended for CI/CD)
+cacheTimeout: 60

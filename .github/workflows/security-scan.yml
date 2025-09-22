@@ -1,0 +1,51 @@
+name: Shai Hulud Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  shai-hulud-scan:
+    name: Scan for Compromised Packages
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Shai Hulud Detector
+        uses: ./  # Use your-org/shai-hulud-detector@v1 when published
+        with:
+          config-path: '.shai-hulud.yml'
+          fail-on-error: 'true'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Upload scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shai-hulud-scan-results
+          path: |
+            shai-hulud-scan-*.json
+            .shai-hulud.yml
+          retention-days: 30
+
+  notify-security-team:
+    name: Notify Security Team
+    needs: shai-hulud-scan
+    runs-on: ubuntu-latest
+    if: failure()
+    
+    steps:
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: '🚨 Shai Hulud scan detected compromised packages in ${{ github.repository }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

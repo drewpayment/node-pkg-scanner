@@ -1,0 +1,33 @@
+name: 'Node Package Scanner'
+description: 'Detect compromised packages (from the Shai Hulud supply chain attack)'
+author: 'Drew Payment'
+
+branding:
+  icon: 'shield'
+  color: 'red'
+
+inputs:
+  config-path:
+    description: 'Path to configuration file (default: .config.yml)'
+    required: false
+    default: '.config.yml'
+  fail-on-error:
+    description: 'Fail the action when compromised packages are found'
+    required: false
+    default: 'true'
+  github-token:
+    description: 'GitHub token for API access'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  compromised-found:
+    description: 'Whether any compromised packages were found (true/false)'
+  compromised-count:
+    description: 'Number of compromised packages found'
+  compromised-packages:
+    description: 'JSON array of compromised packages found'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

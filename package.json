@@ -1,0 +1,45 @@
+{
+  "name": "node-pkg-scanner",
+  "version": "1.0.0",
+  "description": "GitHub Action and CLI tool to detect compromised packages (from the Shai Hulud supply chain attack)",
+  "main": "dist/index.js",
+  "bin": {
+    "node-pkg-scanner": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "cli": "node dist/cli.js",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "security",
+    "supply-chain",
+    "npm",
+    "github-action",
+    "vulnerability"
+  ],
+  "author": "Drew Payment",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1",
+    "@octokit/rest": "^22.0.0",
+    "commander": "^14.0.1",
+    "glob": "^11.0.3",
+    "node-fetch": "^3.3.2",
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@typescript-eslint/eslint-plugin": "^8.44.1",
+    "@typescript-eslint/parser": "^8.44.1",
+    "eslint": "^9.36.0",
+    "jest": "^30.1.0",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
