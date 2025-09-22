@@ -76,6 +76,11 @@ export class CompromisedPackagesFetcher {
         .split(/\r?\n/)
         .map(line => line.trim())
         .filter(line => line && !line.startsWith('#'))
+        .map(line => {
+          // Handle package:version format by extracting just the package name
+          const colonIndex = line.indexOf(':');
+          return colonIndex > 0 ? line.substring(0, colonIndex) : line;
+        })
     );
   }
 
