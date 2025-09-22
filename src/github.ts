@@ -5,13 +5,24 @@ import { ScanSummary } from './types';
 export class GitHubIntegration {
   private octokit;
   private context;
+  private hasValidToken: boolean;
 
   constructor(token?: string) {
     this.context = github.context;
-    this.octokit = github.getOctokit(token || core.getInput('github-token') || process.env.GITHUB_TOKEN || '');
+    const finalToken = token || core.getInput('github-token') || process.env.GITHUB_TOKEN || '';
+    this.hasValidToken = !!finalToken;
+    
+    if (this.hasValidToken) {
+      this.octokit = github.getOctokit(finalToken);
+    }
   }
 
   async postPRComment(summary: ScanSummary): Promise<void> {
+    if (!this.hasValidToken) {
+      console.log('GitHub token not available, skipping PR comment');
+      return;
+    }
+
     if (!this.context.payload.pull_request) {
       console.log('Not running in a pull request context, skipping comment');
       return;
@@ -20,7 +31,7 @@ export class GitHubIntegration {
     const comment = this.generateComment(summary);
     
     try {
-      await this.octokit.rest.issues.createComment({
+      await this.octokit!.rest.issues.createComment({
         owner: this.context.repo.owner,
         repo: this.context.repo.repo,
         issue_number: this.context.payload.pull_request.number,
@@ -71,6 +82,11 @@ export class GitHubIntegration {
   }
 
   setOutputs(summary: ScanSummary): void {
+    if (!this.hasValidToken) {
+      console.log('GitHub token not available, skipping GitHub Actions outputs');
+      return;
+    }
+
     const hasCompromised = summary.compromisedPackages.length > 0;
     
     core.setOutput('compromised-found', hasCompromised.toString());

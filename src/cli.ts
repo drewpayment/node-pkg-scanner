@@ -49,7 +49,7 @@ program
   .option('-f, --force', 'Overwrite existing config file')
   .action((options) => {
     const fs = require('fs');
-    const configPath = '.shai-hulud.yml';
+    const configPath = '.config.yml';
     
     if (fs.existsSync(configPath) && !options.force) {
       console.error(`❌ Config file already exists at ${configPath}`);

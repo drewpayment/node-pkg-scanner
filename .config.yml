@@ -1,0 +1,23 @@
+# Node Package Scanner Configuration
+# Severity level for compromised packages (error, warning, info)
+severityLevel: error
+
+# URL to fetch the compromised packages list from
+compromisedPackagesUrl: https://raw.githubusercontent.com/Cobenian/shai-hulud-detect/main/compromised-packages.txt
+
+# Root directory to scan (optional - defaults to current directory)
+# rootDirectory: ./src
+
+# Additional packages to check for (beyond the remote list)
+additionalPackages: []
+  # - suspicious-package-name
+
+# Directories to exclude from scanning
+excludeDirectories:
+  - node_modules
+  - .git
+  - dist
+  - build
+
+# Cache timeout in minutes
+cacheTimeout: 60

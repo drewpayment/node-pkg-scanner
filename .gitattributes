@@ -1,0 +1,20 @@
+# Ensure shell scripts have Unix line endings
+*.sh text eol=lf
+
+# Ensure Windows batch files have Windows line endings  
+*.bat text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+
+# Documentation
+*.md text
+*.txt text
+
+# Configuration files
+*.yml text
+*.yaml text
+*.json text
