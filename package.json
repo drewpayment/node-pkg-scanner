@@ -10,7 +10,7 @@
     "build": "tsc && ncc build dist/index.js -o dist --source-map",
     "build:action": "npm run clean && tsc && ncc build dist/index.js -o dist && npm run clean:extras",
     "start": "node dist/index.js",
-    "cli": "node dist/cli.js",
+    "cli": "bun src/cli.ts",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "clean": "rm -rf dist",
