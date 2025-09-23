@@ -15,9 +15,9 @@ This tool scans your JavaScript projects for compromised packages identified in 
 
 ## Quick Start
 
-### GitHub Action
+### GitHub Action (Marketplace)
 
-Add to your workflow (`.github/workflows/security-scan.yml`):
+This action is available in the GitHub Actions Marketplace. Add it to your workflow (`.github/workflows/security-scan.yml`):
 
 ```yaml
 name: Security Scan
@@ -33,15 +33,43 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-### CLI Installation
-```bash
-npm install -g node-pkg-scanner
-```bash
-npm install -g node-pkg-scanner
+The action will automatically:
+- Scan your repository for compromised packages
+- Comment on pull requests if issues are found
+- Fail the CI check when compromised packages are detected
+- Support npm, Yarn, and pnpm projects
 
+### CLI Usage (Clone Repository)
+
+Clone and use this tool directly with Bun for local scanning:
+
+#### Prerequisites
+First, install Bun if you haven't already:
 ```bash
-npm install -g node-pkg-scanner
-node-pkg-scanner scan
+curl -fsSL https://bun.sh/install | bash
+```
+Or visit [bun.sh](https://bun.sh) for alternative installation methods.
+
+#### Installation & Usage
+```bash
+# Clone the repository
+git clone https://github.com/drewpayment/node-pkg-scanner.git
+cd node-pkg-scanner
+
+# Install dependencies
+bun install
+
+# Run the scanner
+bun run cli scan
+
+# Scan with custom config
+bun run cli scan --config ./custom-config.yml
+
+# Scan specific directory
+bun run cli scan --directory ./my-project
+
+# Scan without failing on detection (for reporting only)
+bun run cli scan --no-fail
 ```
 
 ## Configuration
@@ -98,29 +126,29 @@ cacheTimeout: 60
 
 ```bash
 # Basic scan
-node-pkg-scanner scan
+bun run cli scan
 
 # Scan with custom config
-node-pkg-scanner scan --config ./custom-config.yml
+bun run cli scan --config ./custom-config.yml
 
 # Scan specific directory
-node-pkg-scanner scan --directory ./my-project
+bun run cli scan --directory ./my-project
 
 # Scan without failing on detection (for reporting only)
-node-pkg-scanner scan --no-fail
+bun run cli scan --no-fail
 
 # Quiet mode (minimal output)
-node-pkg-scanner scan --quiet
+bun run cli scan --quiet
 ```
 
 ### Initialize Configuration
 
 ```bash
 # Create default config file
-node-pkg-scanner init
+bun run cli init
 
 # Overwrite existing config
-node-pkg-scanner init --force
+bun run cli init --force
 ```
 
 ## Advanced Usage
@@ -156,20 +184,23 @@ To block PRs automatically, configure branch protection rules in your GitHub rep
 Use the CLI tool in any CI/CD platform:
 
 ```yaml
-# Azure DevOps example
+# Azure DevOps example (Bun with repo clone)
 - script: |
-    npm install -g node-pkg-scanner
-    node-pkg-scanner scan
+    curl -fsSL https://bun.sh/install | bash
+    git clone https://github.com/drewpayment/node-pkg-scanner.git scanner
+    cd scanner && bun install
+    bun run cli scan --directory ../
   displayName: 'Scan for compromised packages'
 ```
 
 ```yaml
-# GitLab CI example
+# GitLab CI example (Bun with repo clone)
 security-scan:
-  image: node:18
+  image: oven/bun:latest
   script:
-    - npm install -g node-pkg-scanner
-    - node-pkg-scanner scan
+    - git clone https://github.com/drewpayment/node-pkg-scanner.git scanner
+    - cd scanner && bun install
+    - bun run cli scan --directory ../
 ```
 
 ## Package Manager Support
@@ -218,7 +249,11 @@ Cache is stored in system temp directory and respects the `cacheTimeout` configu
 Enable verbose logging by setting the `DEBUG` environment variable:
 
 ```bash
+# With npm global install
 DEBUG=node-pkg-scanner* node-pkg-scanner scan
+
+# With Bun (cloned repository)
+DEBUG=node-pkg-scanner* bun run cli scan
 ```
 
 ## Contributing
