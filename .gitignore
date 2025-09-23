@@ -1,7 +1,6 @@
 # Shai Hulud Detector - .gitignore
 
 # Build outputs
-dist/
 build/
 lib/
 out/
