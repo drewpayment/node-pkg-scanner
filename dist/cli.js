@@ -87,4 +87,3 @@ program.parse();
 if (!process.argv.slice(2).length) {
     program.outputHelp();
 }
-//# sourceMappingURL=cli.js.map

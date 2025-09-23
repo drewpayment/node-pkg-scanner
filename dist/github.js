@@ -120,4 +120,3 @@ class GitHubIntegration {
     }
 }
 exports.GitHubIntegration = GitHubIntegration;
-//# sourceMappingURL=github.js.map

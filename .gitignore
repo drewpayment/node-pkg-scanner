@@ -48,6 +48,11 @@ web_modules/
 # TypeScript cache
 *.tsbuildinfo
 
+# TypeScript debug files (if accidentally generated)
+*.d.ts.map
+*.js.map
+# Note: dist/ folder is committed for GitHub Action, but exclude debug files
+
 # Optional npm cache directory
 .npm
 

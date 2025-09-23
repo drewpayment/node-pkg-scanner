@@ -140,4 +140,3 @@ class NodePackageScanner {
     }
 }
 exports.NodePackageScanner = NodePackageScanner;
-//# sourceMappingURL=detector.js.map

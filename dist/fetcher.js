@@ -174,4 +174,3 @@ class CompromisedPackagesFetcher {
     }
 }
 exports.CompromisedPackagesFetcher = CompromisedPackagesFetcher;
-//# sourceMappingURL=fetcher.js.map

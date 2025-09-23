@@ -8,4 +8,3 @@ exports.DEFAULT_CONFIG = {
     excludeDirectories: ['node_modules', '.git', 'dist', 'build'],
     cacheTimeout: 60 // 1 hour
 };
-//# sourceMappingURL=types.js.map

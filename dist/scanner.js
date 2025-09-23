@@ -273,4 +273,3 @@ class PackageScanner {
     }
 }
 exports.PackageScanner = PackageScanner;
-//# sourceMappingURL=scanner.js.map
