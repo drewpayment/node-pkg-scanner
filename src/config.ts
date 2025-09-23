@@ -15,7 +15,7 @@ export class ConfigManager {
   }
 
   private loadConfig(configPath?: string): Config {
-    const defaultPath = '.shai-hulud.yml';
+    const defaultPath = '.config.yml';
     const finalPath = configPath || defaultPath;
 
     if (!fs.existsSync(finalPath)) {

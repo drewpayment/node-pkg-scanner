@@ -7,11 +7,14 @@
     "node-pkg-scanner": "dist/cli.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && ncc build dist/index.js -o dist --source-map",
+    "build:action": "npm run clean && tsc && ncc build dist/index.js -o dist && npm run clean:extras",
     "start": "node dist/index.js",
     "cli": "node dist/cli.js",
     "test": "jest",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist",
+    "clean:extras": "find dist -name '*.js' ! -name 'index.js' ! -name '*.index.js' -delete"
   },
   "keywords": [
     "security",
@@ -26,6 +29,7 @@
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.1",
     "@octokit/rest": "^22.0.0",
+    "@vercel/ncc": "^0.38.4",
     "commander": "^14.0.1",
     "glob": "^11.0.3",
     "node-fetch": "^3.3.2",

@@ -13,7 +13,7 @@ export class CompromisedPackagesFetcher {
   private cacheFile: string;
 
   constructor() {
-    this.cacheDir = path.join(os.tmpdir(), 'shai-hulud-detector');
+    this.cacheDir = path.join(os.tmpdir(), 'node-pkg-scanner');
     this.cacheFile = path.join(this.cacheDir, 'compromised-packages.txt');
     this.ensureCacheDir();
   }
